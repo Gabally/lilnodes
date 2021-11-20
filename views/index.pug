@@ -1,0 +1,10 @@
+include base.pug
+div
+    h2="Code Editor:"
+    div#editor
+    div.center.button-group
+        button(id="create-node" class="nav-link") Create
+    div.center
+        h3="Created Nodes:"
+    script(src='/codeflask.min.js')
+    script(src='/editor.js')
