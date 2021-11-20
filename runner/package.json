@@ -1,11 +1,13 @@
 {
   "name": "code-runner-worker",
   "version": "0.0.1",
-  "description": "program that executes untrusted code from inside a docker container, and passes a JSON object to the function from stdin and returns the result on stdout",
+  "description": "program that executes untrusted code from inside a docker container, and passes a JSON object to the function from stdin and returns the result to stdout",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon ./src/index.ts",
+    "build": "tsc",
+    "start": "ts-node ./src/index.ts"
   },
   "author": "Gabriele Morisano",
   "license": "MIT",
@@ -13,6 +15,8 @@
     "vm2": "^3.9.5"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
   }
 }
