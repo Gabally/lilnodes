@@ -1,5 +1,7 @@
 import { default as readline } from "readline";
 import { readObject, writeObject } from "./io";
+import { runInSandBox } from "./sandbox";
+import { installPackages } from "./npm-zombie";
 
 const reader = readline.createInterface({
     input: process.stdin,
@@ -7,7 +9,9 @@ const reader = readline.createInterface({
 });
 
 (async () => {
-    const code = await readObject(reader);
-    writeObject(code);
+    const { code, dependencies, context } = await readObject(reader);
+    await installPackages(dependencies);
+    let result = await runInSandBox(code, dependencies, context);
+    writeObject(result);
     reader.close();
 })();

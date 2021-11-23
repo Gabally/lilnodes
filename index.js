@@ -6,7 +6,7 @@ app.set('view engine', 'pug');
 
 app.get('/exec', (req, res) => {
     try {
-        String(eval(req.query.code)); 
+        String(eval(req.query.code));
     } catch (error) {
         res.writeHead(500);
         res.end(error.message);
@@ -23,6 +23,9 @@ app.get('/about', (req, res) => {
 
 app.use(express.static('public'));
 
+
+//docker run --privileged -d --name dind-test docker:dind
+//docker run --add-host=host.docker.internal:host-gateway -it alpine
 app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`);
+    console.log(`App listening at http://localhost:${port}`);
 });

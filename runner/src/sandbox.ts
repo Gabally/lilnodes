@@ -6,7 +6,7 @@ export const runInSandBox = async (code: string, dependencies: string[], context
         try {
             const vm = new NodeVM({
                 require: {
-                    external: false
+                    external: dependencies
                 },
                 console: "off",
                 wasm: false,
