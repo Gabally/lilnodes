@@ -35,16 +35,16 @@ body {
     border-radius: 5px;
     background: white;
     display: block;
-    transition: all 80ms ease-in-out;
+    transition: all 120ms ease-in-out;
     cursor: pointer;
 }
 .nav-link:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     -webkit-box-shadow: 1px 5px 4px 3px rgba(0,0,0,0.31); 
     box-shadow: 1px 5px 4px 3px rgba(0,0,0,0.31);
 }
 .nav-link:active {
- transform: translateY(2px);   
+ transform: translateY(1px);   
 }
 .nav-link:last-child {
     margin-right: 10px;
@@ -64,8 +64,9 @@ body {
     border-radius: 5px;
     position: relative !important;
 }
-h2 {
+h3 {
     margin-top: 10px;
+    margin-bottom: 10px;
     text-align: center;
     color: rgb(206, 206, 206);
 }
@@ -74,4 +75,37 @@ h2 {
 }
 .button-group {
     margin: 15px;
+}
+#dependencies {
+    width: 40%;
+    border: 1px solid white;
+    height: 15vh;
+    display: flex;
+    flex-direction: column;
+}
+#dep-list {
+    flex-grow: 1;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+#dep-list::-webkit-scrollbar {
+    display: none;
+  }
+#dep-input {
+    border: 0px;
+    outline: none;
+    border-top: 1px solid rgb(185, 185, 185);
+    background: transparent;
+    color: white;
+    font-size: 15px;
+    flex-grow: 1;
+    padding: 4px;
+}
+.btn {
+    background: transparent;
+    border: 0px;
+    outline: none;
+    background: rgb(206, 205, 205);
+    padding: 4px;
 }

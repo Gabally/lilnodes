@@ -1,7 +1,14 @@
 include base.pug
 div
-    h2="Code Editor:"
+    h3="Function:"
     div#editor
+    h3="Dependencies:"
+    div.center
+        div#dependencies
+            div#dep-list
+            div.center
+                input(type="text", placeholder="package name", spellcheck="false", name="", id="dep-input")
+                button(class="btn") ➕
     div.center.button-group
         button(id="create-node" class="nav-link") Create
     div.center
