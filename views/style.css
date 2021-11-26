@@ -158,3 +158,15 @@ h3 {
 .btn:active {
     background: rgb(153, 153, 153);
 }
+
+.md  ul li:before {
+    content: "•";
+    color: rgb(141, 141, 141);
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em
+}
+
+.md p {
+    margin: 10px;
+}

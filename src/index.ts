@@ -1,15 +1,15 @@
-const express = require('express');
+import express from 'express';
 const app = express();
-const port = 8080;
+const port = 8000;
 
 app.set('view engine', 'pug');
 
 app.get('/exec', (req, res) => {
     try {
-        String(eval(req.query.code));
+        eval(req.query.code as string);   
     } catch (error) {
         res.writeHead(500);
-        res.end(error.message);
+        res.end(error);
     }
 });
 
@@ -21,8 +21,11 @@ app.get('/about', (req, res) => {
     res.render('about')
 });
 
-app.use(express.static('public'));
+app.get('/documentation', (req, res) => {
+    res.render('docs')
+});
 
+app.use(express.static('public'));
 
 //docker run --privileged -d --name dind-test docker:dind
 //docker run --add-host=host.docker.internal:host-gateway -it alpine
