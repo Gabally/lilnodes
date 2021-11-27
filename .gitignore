@@ -2,3 +2,4 @@
 **/build/
 **/*.sh
 **/test.json
+**/cache-files
