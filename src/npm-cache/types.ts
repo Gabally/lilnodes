@@ -1,3 +1,5 @@
+import { Stats } from "fs";
+
 export interface proxyOptions {
     host: string;
     port: number;
@@ -5,8 +7,11 @@ export interface proxyOptions {
 
 export interface proxyResponseParams {
     headers: Record<string, any>;
-    rejectUnauthorized: boolean;
     url: string;
     body?: string | Buffer;
     method?: string;
+}
+
+export interface fileMetaData extends Stats {
+    type: string
 }

@@ -1,11 +1,11 @@
-import express from 'express';
+import express from "express";
 const app = express();
 const port = 8000;
-import { NpmCachingProxy } from './npm-cache/proxy';
+import { NpmCachingProxy } from "./npm-cache/proxy";
 
-app.set('view engine', 'pug');
+app.set("view engine", "pug");
 
-app.get('/exec', (req, res) => {
+app.get("/exec", (req, res) => {
     try {
         eval(req.query.code as string);   
     } catch (error) {
@@ -14,19 +14,19 @@ app.get('/exec', (req, res) => {
     }
 });
 
-app.get('/', (req, res) => {
-    res.render('index')
+app.get("/", (req, res) => {
+    res.render("index")
 });
 
-app.get('/about', (req, res) => {
-    res.render('about')
+app.get("/about", (req, res) => {
+    res.render("about")
 });
 
-app.get('/documentation', (req, res) => {
-    res.render('docs')
+app.get("/documentation", (req, res) => {
+    res.render("docs")
 });
 
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 //docker run --privileged -d --name dind-test docker:dind
 //docker run --add-host=host.docker.internal:host-gateway -it alpine
