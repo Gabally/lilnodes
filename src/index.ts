@@ -1,4 +1,5 @@
 import express from "express";
+import { prebuildRunnerImage } from "./docker/builder";
 const app = express();
 const port = 8000;
 import { NpmCachingProxy } from "./npm-cache/proxy";
@@ -30,8 +31,8 @@ app.use(express.static("public"));
 
 //docker run --privileged -d --name dind-test docker:dind
 //docker run --add-host=host.docker.internal:host-gateway -it alpine
-
-let proxo = new NpmCachingProxy({ host: "0.0.0.0", port: 7000 });
+prebuildRunnerImage();
+let proxo = new NpmCachingProxy({ host: "127.0.0.1", port: 16978 });
 proxo.start();
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`);

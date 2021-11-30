@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 
 const installPackage = async (pkg: string): Promise<void> => {
     return new Promise((resolve, reject) => {
-        const child = spawn("npm", ["install", pkg]);
+        const child = spawn("npm", ["--proxy", "http://host.docker.internal:16978", "--https-proxy", "http://host.docker.internal:16978", "--strict-ssl", "false", "install", pkg]);
         child.on("close", (code) => {
             if (code !== 0) {
                 reject(new Error("An error occurred while installing the packages"));

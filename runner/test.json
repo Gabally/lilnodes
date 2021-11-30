@@ -1,1 +1,0 @@
-{"code": "module.exports = function(context, respond) { respond({\"code\":200}); }","dependencies": ["node-fetch", "axios"],"context": {"query": {},"method": "GET","headers": {},"body": "","path": "/"}}

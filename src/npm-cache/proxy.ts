@@ -39,20 +39,17 @@ export class NpmCachingProxy {
   async httpHandler(req: http.IncomingMessage, res: http.ServerResponse, cache: fsCache, isHttps: boolean = false) {
     let schema = isHttps ? "https" : "http";
     const { pathname } = new URL(req.url || "", `https://${req.headers["host"]}`);
-    let destination =  schema + "://" + req.headers["host"] + pathname;
-    console.log(destination);
+    let destination =  `${schema}://${req.headers["host"]}${pathname}`;
     if (req.headers[this.cycleCheckHeader]) {
       res.writeHead(502);
       res.end("cycle");
     } else if (req.method !== "GET") {
-      console.log("request is not get");
       this.proxyBypass(req, res, destination);
     } else {
       let meta = cache.meta(destination);
       if (meta) {
         this.respondWithCache(res, meta, cache, destination);
       } else {
-        console.log("No cached, requesting data");
         let response = await axios({
           method: req.method,
           url: destination,
@@ -71,9 +68,9 @@ export class NpmCachingProxy {
   httpsHandler(req: http.IncomingMessage, socketReq: internal.Duplex, bodyHead: Buffer, mitmPort: number) {
     let httpVersion = req["httpVersion"];
     const proxySocket = new Socket();
-    proxySocket.connect(mitmPort, "127.0.0.1", () => {      console.log(bodyHead.toString());
+    proxySocket.connect(mitmPort, "127.0.0.1", () => {
       proxySocket.write(bodyHead);
-      socketReq.write("HTTP/" + httpVersion + " 200 Connection established\r\n\r\n");
+      socketReq.write(`HTTP/${httpVersion} 200 Connection established\r\n\r\n`);
     });
 
     proxySocket.on("data", (chunk) => {
@@ -93,20 +90,16 @@ export class NpmCachingProxy {
     });
 
     proxySocket.on("error", (err) => {
-      console.error(err);
-      socketReq.write("HTTP/" + httpVersion + " 500 Connection error\r\n\r\n");
+      socketReq.write(`HTTP/${httpVersion} 500 Connection error\r\n\r\n`);
       socketReq.end();
     });
   
     socketReq.on("error", (err) => {
-      console.error(err);
       proxySocket.end();
     });
   }
 
   async proxyBypass(req: http.IncomingMessage, res: http.ServerResponse, url: string) {
-    console.log("Bypass: " + url);
-
     const buffers = [];
 
     for await (const chunk of req) {
@@ -126,7 +119,6 @@ export class NpmCachingProxy {
   }
 
   respondWithCache(res: http.ServerResponse, meta: fileMetaData, cache: fsCache, url: string) {
-    console.log("Cache hit: " + url);
     res.setHeader("Content-Length", meta.size);
     res.setHeader("Content-Type", meta.type);
     res.setHeader("Connection", "keep-alive");
