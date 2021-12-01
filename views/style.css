@@ -71,7 +71,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 .nav-link:active {
-    transform: scale(1.01);
+    transform: translateY(1px);
 }
 
 .nav-link:last-child {

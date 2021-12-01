@@ -10,5 +10,5 @@ The functions run in a container with limited resources:
 
 - Limited amount of memory (100mb).
 - Execution time capped to 5 seconds.
-- The filesystem is read only.
+- maximum one request every three seconds. 
 - You only have access to the dependencies you inclued.

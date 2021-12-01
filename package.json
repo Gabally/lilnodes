@@ -16,8 +16,7 @@
     "dockerode": "^3.3.1",
     "express": "^4.17.1",
     "jstransformer-markdown-it": "^2.1.0",
-    "pug": "^3.0.2",
-    "request": "^2.65.0"
+    "pug": "^3.0.2"
   },
   "devDependencies": {
     "@types/dockerode": "^3.3.0",

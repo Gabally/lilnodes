@@ -2,7 +2,7 @@ import Docker from "dockerode";
 import Dockerode from "dockerode";
 import { readdirSync } from "fs";
 import path from "path";
-import { RUNNER_IMAGE_NAME } from "../constants";
+import { RUNNER_IMAGE_NAME } from "./constants";
 
 export const prebuildRunnerImage = async (): Promise<any[]> => {
     let docker = new Docker();
