@@ -1,8 +1,14 @@
 import express from "express";
+import { checkForKey, encryptCode } from "./encryption";
 import { NpmCachingProxy } from "./npm-cache/proxy";
+import { ArrayType, DATA_TYPES, validateObject } from "./objectValidator";
+import { CreateNodeRequest } from "./types";
+import { asyncEvery } from "./utils";
 
 const app = express();
 const port = 8000;
+
+app.use(express.json({ limit: "2mb" }));
 
 app.set("view engine", "pug");
 
@@ -15,22 +21,36 @@ app.get("/exec", (req, res) => {
     }
 });
 
+//await asyncEvery(data.dependencies, async(d) => await checkPackage(d))
+app.post("/createnode", async (req, res) => {
+    let data = <CreateNodeRequest>req.body;
+    if (validateObject({
+        code: DATA_TYPES.STRING,
+        dependencies: new ArrayType(DATA_TYPES.STRING)
+    }, data)) {
+        res.status(200).json({ success: true, url: encryptCode(JSON.stringify(data.code))});
+    } else {
+        res.status(400).json({ success: false, error: "Invalid data" });
+    }
+});
+
 app.get("/", (req, res) => {
-    res.render("index")
+    res.render("index");
 });
 
 app.get("/about", (req, res) => {
-    res.render("about")
+    res.render("about");
 });
 
 app.get("/documentation", (req, res) => {
-    res.render("docs")
+    res.render("docs");
 });
 
 app.use(express.static("public"));
 
 //docker run --privileged -d --name dind-test docker:dind
 //docker run --add-host=host.docker.internal:host-gateway -it alpine
+checkForKey();
 let proxo = new NpmCachingProxy({ host: "127.0.0.1", port: 16978 });
 proxo.start();
 app.listen(port, () => {
