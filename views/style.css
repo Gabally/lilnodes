@@ -82,14 +82,8 @@ body::-webkit-scrollbar-thumb {
     color: rgba(214, 214, 214, 0.815);
 }
 
-#editor {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
 .codeflask {
-    width: 60% !important;
+    width: 100% !important;
     height: 70vh !important;
     border: 2px solid rgba(97, 97, 97, 0.815);
     border-radius: 5px;
@@ -169,4 +163,58 @@ h3 {
 
 .md p {
     margin: 10px;
+}
+
+.dep {
+    padding: 3px;
+    border-bottom: 1px solid rgb(228, 228, 228);
+}
+
+.filler {
+    width: 30%;
+}
+
+#editor-container {
+    display: flex;
+    justify-content: center;
+}
+
+#editor {
+    width: 100%;
+}
+
+.filename {
+    margin-left: 35%;
+    margin-right: 10px;
+    border-radius: 3px;
+    padding: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    justify-content: flex-start;
+    user-select: none;
+    cursor: pointer;
+    margin-bottom: 7px;
+}
+
+.filename:hover {
+    background: rgba(177, 176, 176, 0.356);
+}
+
+.filename:active {
+    background: rgba(156, 155, 155, 0.356);
+}
+
+.f-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+}
+
+.good {
+    background: rgba(105, 230, 105, 0.877);
+}
+
+.bad {
+    background: rgba(235, 102, 102, 0.726);
 }
