@@ -7,7 +7,7 @@ import http, { IncomingMessage } from "http";
 import { Socket } from "net";
 import { createWriteStream, readFileSync } from "fs";
 import path from "path";
-import { Axios, default as axios } from "axios";
+import axios from "axios";
 
 export class NpmCachingProxy {
 
