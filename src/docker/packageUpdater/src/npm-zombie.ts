@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 
 export const installPackage = async (pkg: string, workDir: string): Promise<void> => {
     return new Promise((resolve, reject) => {
-        const child = spawn("npm", ["install", pkg],
+        const child = spawn("npm", ["--proxy", "http://host.docker.internal:16978", "--https-proxy", "http://host.docker.internal:16978", "--strict-ssl", "false", "install", pkg],
         {
             cwd: workDir
         });
