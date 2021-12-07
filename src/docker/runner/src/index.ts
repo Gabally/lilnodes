@@ -9,9 +9,14 @@ const reader = readline.createInterface({
 });
 
 (async () => {
-    const { code, dependencies, context } = await readObject(reader);
-    await installPackages(dependencies);
-    let result = await runInSandBox(code, dependencies, context);
-    writeObject(result);
-    reader.close();
+    try {
+        const { code, dependencies, context } = await readObject(reader);
+        await installPackages(dependencies);
+        let result = await runInSandBox(code, dependencies, context);
+        writeObject({ type: "success", content: result });
+        reader.close();
+    } catch(e: any) {
+        writeObject({ type: "error", content: e.message });
+        reader.close();
+    }
 })();

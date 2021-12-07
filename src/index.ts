@@ -3,7 +3,6 @@ import { checkForKey, encryptCode } from "./encryption";
 import { NpmCachingProxy } from "./npm-cache/proxy";
 import { ArrayType, DATA_TYPES, validateObject } from "./objectValidator";
 import { CreateNodeRequest } from "./types";
-import { asyncEvery } from "./utils";
 
 const app = express();
 const port = 8000;

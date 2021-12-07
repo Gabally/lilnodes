@@ -1,6 +1,6 @@
 import { default as readline } from "readline";
 
-export const readObject = (reader: readline.Interface): any => {
+export const readObject = async (reader: readline.Interface): Promise<any> => {
     return new Promise((resolve, reject) => {
         reader.question("", (data: string) => {
             try {
