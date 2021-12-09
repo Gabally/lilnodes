@@ -3,10 +3,10 @@ div
     h3="Editor:"
     div#editor-container
         div.filler
-            div(class="filename center")
+            div(class="filename center selected-file" id="file-code")
                 img(src="js-icon.svg", class="f-icon")
                 span="index.js"
-            div(class="filename center")
+            div(class="filename center" id="file-package")
                 img(src="npm-icon.svg", class="f-icon")
                 span="package.json" 
         div#editor
@@ -14,11 +14,14 @@ div
     h3="Dependencies:"
     div.center
         div.center
-            button(id="create-node" class="nav-link good") ➕ Add dependency
-            button(id="create-node" class="nav-link bad") 🗑️ Remove dependency
+        button(id="reset-editor" class="nav-link action") 🔄
+            button(id="add-dep" class="nav-link good") ➕ Add dependency
+            button(id="remove-dep" class="nav-link bad") 🗑️ Remove dependency
+            button(id="test-node" class="nav-link test") ⚗️ Test
     div.center.button-group
         button(id="create-node" class="nav-link") Create
     div.center
         h3="Created Nodes:"
     script(src="/codeflask.min.js")
+    script(src="/command-modal.js")
     script(src="/editor.js")
