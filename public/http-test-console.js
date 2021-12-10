@@ -1,9 +1,5 @@
-class CommandModal {
-    constructor(title, question, options) {
-        this.action = options.action || function(){};
-        this.placeHolder = options.placeHolder || "";
-        this.actionText = options.actionText || "OK"; 
-        this.question = question;
+class HttpTestConsole {
+    constructor(url) {
         this.obscurator = document.createElement("div");
         this.obscurator.style.display = "block";
         this.obscurator.style.width = "100vw";
@@ -24,11 +20,11 @@ class CommandModal {
         this.modal.style.border = "2px solid black";
         this.modal.style.borderRadius = "5px";
         this.title = document.createElement("h3");
-        this.title.innerText = title;
+        this.title.innerText = "⚗️ Test Function 🧪";
         this.modal.appendChild(this.title);
+        let text = document.createElement("div");
         this.inputBox = document.createElement("div");
-        this.textField = document.createElement("input");
-        this.textField.type = "text";
+        this.textField = document.createElement("textarea");
         this.textField.style.outline = "none";
         this.textField.style.border = "0px";
         this.textField.style.borderBottom = "1px solid white";
@@ -37,8 +33,6 @@ class CommandModal {
         this.textField.style.color = "white";
         this.textField.style.margin = "5px";
         this.textField.style.fontSize = "15px";
-        this.textField.placeholder = this.placeHolder;
-        this.inputBox.textContent = question;
         this.inputBox.appendChild(this.textField);
         this.modal.appendChild(this.inputBox);
         let btnContainer = document.createElement("div");
@@ -54,8 +48,6 @@ class CommandModal {
         this.confirmButton = document.createElement("button");
         this.confirmButton.classList.add("nav-link");
         this.confirmButton.classList.add("good");
-        this.confirmButton.innerText = options.actionText;
-        this.confirmButton.addEventListener("click", () => this.action());
         btnContainer.appendChild(this.confirmButton);
         this.modal.appendChild(btnContainer);
     }
@@ -89,14 +81,6 @@ class CommandModal {
         this.modal.remove();
         document.body.style.overflowY = "visible";
         document.body.style.overflowX = "visible";
-    }
-
-    getValue() {
-        return this.textField.value;
-    }
-
-    clearModal() {
-        this.textField.value = "";
     }
 
     disableButtons() {

@@ -50,11 +50,3 @@ const parsePackageName = (packageName: string): Package => {
         }
     }
 };
-
-export const removeDependency = (packageFile: string, packageName: string): string => {
-    let packageJson = JSON.parse(packageFile);
-    if (packageJson["dependencies"]) {
-        delete packageJson["dependencies"][packageName];
-    }
-    return JSON.stringify(packageJson);
-}

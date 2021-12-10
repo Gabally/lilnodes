@@ -6,15 +6,6 @@ var editorFiles = {
 };
 var selectedFile = editorFiles.Code;
 
-editor.onUpdate((newCode) => {
-    if (selectedFile === editorFiles.Code) {
-        code = newCode;
-        localStorage.setItem("code", newCode);
-    } else if (selectedFile === editorFiles.Package) {
-        package = newCode;
-        localStorage.setItem("package", newCode);
-    }
-});  
 var dependencies = [];
 
 const sendPOST = async (url, data) => {
@@ -120,11 +111,21 @@ const removeDependency = () => {
     modal.show();
 };
 
-window.onload = async () => {
+document.addEventListener("DOMContentLoaded", async () => {
     package = localStorage.getItem("package") || await fetchAsText("/package.json");
     code = localStorage.getItem("code") || await fetchAsText("/example-function.js");
     editor.updateCode(code);
-};
+    editor.onUpdate((newCode) => {
+        if (selectedFile === editorFiles.Code) {
+            code = newCode;
+            localStorage.setItem("code", newCode);
+        } else if (selectedFile === editorFiles.Package) {
+            package = newCode;
+            localStorage.setItem("package", newCode);
+        }
+    });
+    new HttpTestConsole("http://localhost   ").show();
+});
 
 $("#create-node").addEventListener("click", () => {
     createNode();
@@ -136,3 +137,4 @@ $("#remove-dep").addEventListener("click", removeDependency);
 $("#file-code").addEventListener("click", setCodeActive);
 $("#file-package").addEventListener("click", setPackageActive);
 $("#reset-editor").addEventListener("click", resetEditor);
+//$("#test-node").addEventListener("click", testNode);

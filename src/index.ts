@@ -2,7 +2,7 @@ import express from "express";
 import { checkForKey, encryptCode } from "./encryption";
 import { NpmCachingProxy } from "./npm-cache/proxy";
 import { ArrayType, DATA_TYPES, validateObject } from "./objectValidator";
-import { addDependency, removeDependency } from "./packageUpdater";
+import { addDependency } from "./packageUpdater";
 import { CreateNodeRequest } from "./types";
 
 const app = express();
@@ -25,16 +25,6 @@ app.post("/addPackage", async (req, res) => {
     try {
         let { packageName, packageFile } = req.body;
         let newPackage = await addDependency(packageName, packageFile);
-        res.status(200).json({ success: true, packageFile: newPackage });
-    } catch(err) {
-        res.status(500).json({ success: false, error: err });
-    }
-});
-
-app.post("/removePackage", (req, res) => {
-    try {
-        let { packageName, packageFile } = req.body;
-        let newPackage =  removeDependency(packageFile, packageName);
         res.status(200).json({ success: true, packageFile: newPackage });
     } catch(err) {
         res.status(500).json({ success: false, error: err });
