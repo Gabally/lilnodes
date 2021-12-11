@@ -1,6 +1,6 @@
 export interface CreateNodeRequest {
     code: string,
-    dependencies: string[]
+    package: string
 }
 
 export interface Package {

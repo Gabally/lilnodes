@@ -1,7 +1,7 @@
 import express from "express";
 import { checkForKey, encryptCode } from "./encryption";
 import { NpmCachingProxy } from "./npm-cache/proxy";
-import { ArrayType, DATA_TYPES, validateObject } from "./objectValidator";
+import { DATA_TYPES, validateObject } from "./objectValidator";
 import { addDependency } from "./packageUpdater";
 import { CreateNodeRequest } from "./types";
 
@@ -36,9 +36,9 @@ app.post("/createnode", async (req, res) => {
     let data = <CreateNodeRequest>req.body;
     if (validateObject({
         code: DATA_TYPES.STRING,
-        dependencies: new ArrayType(DATA_TYPES.STRING)
+        package: DATA_TYPES.STRING
     }, data)) {
-        res.status(200).json({ success: true, url: encryptCode(JSON.stringify(data.code))});
+        res.status(200).json({ success: true, url: encryptCode(JSON.stringify(data))});
     } else {
         res.status(400).json({ success: false, error: "Invalid data" });
     }
