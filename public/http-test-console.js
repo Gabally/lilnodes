@@ -1,5 +1,7 @@
 class HttpTestConsole {
     constructor(url) {
+        this.url = url;
+        this.headers = {};
         this.obscurator = this.createElement("div", {
             style: `
             display: block;
@@ -24,14 +26,30 @@ class HttpTestConsole {
             border: 2px solid black;
             border-radius: 5px;
             width: 45vw;
-            height: 30vh;
             `
-        });
-        this.title = this.createElement("h3", {
+        }); 
+        this.modal.appendChild(this.createElement("h3", {
             text: "⚗️ Test Function 🧪"
+        }));
+        this.modal.appendChild(this.createTextNode("Method:"));
+        this.method = this.createElement("select", {
+            style:`
+            outline: none;
+            margin: 10px;
+            font-size: 16px;
+            ` 
         });
-        this.modal.appendChild(this.title);
+        ["GET", "POST", "PUT", "PATCH", "DELETE"].forEach(method => {
+            this.method.appendChild(this.createElement("option", {
+                text: method,
+                attributes: {
+                    value: method
+                }
+            }));
+        });
+        this.modal.appendChild(this.method);
         this.inputBox = document.createElement("div");
+        this.modal.appendChild(this.createTextNode("Body:"));
         this.textField = this.createElement("textarea", {
             style:`
                 outline: none;
@@ -50,8 +68,119 @@ class HttpTestConsole {
         });
         this.inputBox.appendChild(this.textField);
         this.modal.appendChild(this.inputBox);
+        this.modal.appendChild(this.createTextNode("Headers:"));
+        let addHeaderContainer = this.createElement("div", {
+            style:`
+            display: flex;
+            `
+        });
+        this.addHeaderButton = this.createElement("button", {
+            text: "➕",
+            classes: ["nav-link", "good"],
+            style:`
+            margin: 5px;
+            `
+        });
+        addHeaderContainer.appendChild(this.addHeaderButton);
+        this.headerNameInput = this.createElement("input", {
+            attributes: {
+                type: "text",
+                placeholder: "Name",
+                spellcheck: false
+            },
+            style:`
+            outline: none;
+            border: 0px;
+            border-bottom: 1px solid white;
+            background: transparent;
+            color: white;
+            margin: 5px;
+            font-size: 15px;
+            `
+        });
+        addHeaderContainer.appendChild(this.headerNameInput);
+        this.headerValueInput = this.createElement("input", {
+            attributes: {
+                type: "text",
+                placeholder: "Value",
+                spellcheck: false
+            },
+            style:`
+            outline: none;
+            border: 0px;
+            border-bottom: 1px solid white;
+            background: transparent;
+            color: white;
+            margin: 5px;
+            font-size: 15px;
+            `
+        });
+        addHeaderContainer.appendChild(this.headerValueInput);
+        this.modal.appendChild(addHeaderContainer);
+        this.headerList = this.createElement("div", {});
+        this.modal.appendChild(this.headerList);
+        this.modal.appendChild(this.createTextNode("Query Parameters:"));
+        let addQueryParamContainer = this.createElement("div", {
+            style:`
+            display: flex;
+            `
+        });
+        this.addQueryButton = this.createElement("button", {
+            text: "➕",
+            classes: ["nav-link", "good"],
+            style:`
+            margin: 5px;
+            `
+        });
+        addQueryParamContainer.appendChild(this.addQueryButton);
+        this.queryNameInput = this.createElement("input", {
+            attributes: {
+                type: "text",
+                placeholder: "Name",
+                spellcheck: false
+            },
+            style:`
+            outline: none;
+            border: 0px;
+            border-bottom: 1px solid white;
+            background: transparent;
+            color: white;
+            margin: 5px;
+            font-size: 15px;
+            `
+        });
+        addQueryParamContainer.appendChild(this.queryNameInput);
+        this.queryValueInput = this.createElement("input", {
+            attributes: {
+                type: "text",
+                placeholder: "Value",
+                spellcheck: false
+            },
+            style:`
+            outline: none;
+            border: 0px;
+            border-bottom: 1px solid white;
+            background: transparent;
+            color: white;
+            margin: 5px;
+            font-size: 15px;
+            `
+        });
+        addQueryParamContainer.appendChild(this.queryValueInput);
+        this.modal.appendChild(addQueryParamContainer);
+        this.modal.appendChild(this.createTextNode("Response:"));
+        this.responseType = this.createElement("select");
+        ["text/json", "html"].forEach(type => {
+            this.responseType.appendChild(this.createElement("option", {
+                text: type,
+                attributes: {
+                    value: type
+                }
+            }));
+        });
+        this.modal.appendChild(this.responseType);
         let btnContainer = this.createElement("div", {
-            style: `
+            style:`
                 display: flex;
                 justify-content: center;
                 margin-top: 15px; 
@@ -66,7 +195,8 @@ class HttpTestConsole {
         });
         btnContainer.appendChild(this.cancelButton);
         this.confirmButton = this.createElement("button", {
-            classes: ["nav-link", "good"]
+            classes: ["nav-link", "good"],
+            text: "📡 Send"
         });
         btnContainer.appendChild(this.confirmButton);
         this.modal.appendChild(btnContainer);
@@ -139,5 +269,18 @@ class HttpTestConsole {
             el.setAttribute(attr, options.attributes[attr]);
         }
         return el;
+    }
+
+    createTextNode(text) {
+        let el = document.createElement("div");
+        el.innerText = text;
+        return el;
+    }
+
+    addHeader(name, value) {
+        this.headers[name] = value;
+        for (const h in this.headers) {
+            
+        }
     }
 }
