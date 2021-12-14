@@ -2,6 +2,25 @@ class HttpTestConsole {
     constructor(url) {
         this.url = url;
         this.headers = {};
+        this.queryParams = {};
+        this.textFieldStyle = `
+            outline: none;
+            border: 0px;
+            border-bottom: 1px solid white;
+            background: transparent;
+            color: white;
+            margin: 5px;
+            font-size: 15px;
+        `;
+        this.listStyle = `
+            outline: none;
+            margin: 10px;
+            font-size: 16px;
+            color: #bab8b8;
+            background: transparent;
+            border: 0px;
+            border-bottom: 2px solid grey;
+        `;
         this.obscurator = this.createElement("div", {
             style: `
             display: block;
@@ -25,7 +44,6 @@ class HttpTestConsole {
             padding: 10px;
             border: 2px solid black;
             border-radius: 5px;
-            width: 45vw;
             `
         }); 
         this.modal.appendChild(this.createElement("h3", {
@@ -33,11 +51,7 @@ class HttpTestConsole {
         }));
         this.modal.appendChild(this.createTextNode("Method:"));
         this.method = this.createElement("select", {
-            style:`
-            outline: none;
-            margin: 10px;
-            font-size: 16px;
-            ` 
+            style: this.listStyle 
         });
         ["GET", "POST", "PUT", "PATCH", "DELETE"].forEach(method => {
             this.method.appendChild(this.createElement("option", {
@@ -50,15 +64,9 @@ class HttpTestConsole {
         this.modal.appendChild(this.method);
         this.inputBox = document.createElement("div");
         this.modal.appendChild(this.createTextNode("Body:"));
-        this.textField = this.createElement("textarea", {
+        this.bodyInput = this.createElement("textarea", {
             style:`
-                outline: none;
-                border: 0px;
-                border-bottom: 1px solid white;
-                background: transparent;
-                color: white;
-                margin: 5px;
-                font-size: 15px;
+                ${this.textFieldStyle}
                 width: 100%;
                 height: 100%;
             `,
@@ -66,10 +74,10 @@ class HttpTestConsole {
                 spellcheck: false
             }
         });
-        this.inputBox.appendChild(this.textField);
+        this.inputBox.appendChild(this.bodyInput);
         this.modal.appendChild(this.inputBox);
         this.modal.appendChild(this.createTextNode("Headers:"));
-        let addHeaderContainer = this.createElement("div", {
+        this.addHeaderContainer = this.createElement("div", {
             style:`
             display: flex;
             `
@@ -79,45 +87,40 @@ class HttpTestConsole {
             classes: ["nav-link", "good"],
             style:`
             margin: 5px;
-            `
+            `,
+            listeners: {
+                click: () => {
+                    if (this.headerNameInput.value && this.headerValueInput.value) {
+                        this.addHeader(this.headerNameInput.value, this.headerValueInput.value);
+                    }
+                }
+            }
         });
-        addHeaderContainer.appendChild(this.addHeaderButton);
+        this.addHeaderContainer.appendChild(this.addHeaderButton);
         this.headerNameInput = this.createElement("input", {
             attributes: {
                 type: "text",
                 placeholder: "Name",
                 spellcheck: false
             },
-            style:`
-            outline: none;
-            border: 0px;
-            border-bottom: 1px solid white;
-            background: transparent;
-            color: white;
-            margin: 5px;
-            font-size: 15px;
-            `
+            style: this.textFieldStyle
         });
-        addHeaderContainer.appendChild(this.headerNameInput);
+        this.addHeaderContainer.appendChild(this.headerNameInput);
         this.headerValueInput = this.createElement("input", {
             attributes: {
                 type: "text",
                 placeholder: "Value",
                 spellcheck: false
             },
+            style: this.textFieldStyle
+        });
+        this.addHeaderContainer.appendChild(this.headerValueInput);
+        this.modal.appendChild(this.addHeaderContainer);
+        this.headerList = this.createElement("div", {
             style:`
-            outline: none;
-            border: 0px;
-            border-bottom: 1px solid white;
-            background: transparent;
-            color: white;
-            margin: 5px;
-            font-size: 15px;
+            margin: 10px;
             `
         });
-        addHeaderContainer.appendChild(this.headerValueInput);
-        this.modal.appendChild(addHeaderContainer);
-        this.headerList = this.createElement("div", {});
         this.modal.appendChild(this.headerList);
         this.modal.appendChild(this.createTextNode("Query Parameters:"));
         let addQueryParamContainer = this.createElement("div", {
@@ -130,7 +133,16 @@ class HttpTestConsole {
             classes: ["nav-link", "good"],
             style:`
             margin: 5px;
-            `
+            `,
+            listeners: {
+                click: () => {
+                    if (this.queryNameInput.value && this.queryValueInput.value) {
+                        this.addQueryParam(this.queryNameInput.value, this.queryValueInput.value);
+                        this.queryNameInput.value = "";
+                        this.queryValueInput.value = "";
+                    }
+                }
+            }
         });
         addQueryParamContainer.appendChild(this.addQueryButton);
         this.queryNameInput = this.createElement("input", {
@@ -139,15 +151,7 @@ class HttpTestConsole {
                 placeholder: "Name",
                 spellcheck: false
             },
-            style:`
-            outline: none;
-            border: 0px;
-            border-bottom: 1px solid white;
-            background: transparent;
-            color: white;
-            margin: 5px;
-            font-size: 15px;
-            `
+            style: this.textFieldStyle
         });
         addQueryParamContainer.appendChild(this.queryNameInput);
         this.queryValueInput = this.createElement("input", {
@@ -156,20 +160,30 @@ class HttpTestConsole {
                 placeholder: "Value",
                 spellcheck: false
             },
-            style:`
-            outline: none;
-            border: 0px;
-            border-bottom: 1px solid white;
-            background: transparent;
-            color: white;
-            margin: 5px;
-            font-size: 15px;
-            `
+            style: this.textFieldStyle
         });
         addQueryParamContainer.appendChild(this.queryValueInput);
         this.modal.appendChild(addQueryParamContainer);
-        this.modal.appendChild(this.createTextNode("Response:"));
-        this.responseType = this.createElement("select");
+        this.queryParamsList = this.createElement("div", {
+            style:`
+            margin: 10px;
+            `
+        });
+        this.modal.appendChild(this.queryParamsList);
+        this.modal.appendChild(this.createTextNode("Response Display Type:"));
+        this.responseType = this.createElement("select", {
+            style: this.listStyle,
+            listeners: {
+                change: () => {
+                    this.responseContainer.innerHTML = "";
+                    if (this.responseType.value === "text/json") {
+                        this.responseContainer.appendChild(this.textDisplay);
+                    } else {
+                        this.responseContainer.appendChild(this.htmlRenderer);
+                    }
+                }
+            }
+        });
         ["text/json", "html"].forEach(type => {
             this.responseType.appendChild(this.createElement("option", {
                 text: type,
@@ -179,6 +193,32 @@ class HttpTestConsole {
             }));
         });
         this.modal.appendChild(this.responseType);
+        this.responseContainer = this.createElement("div", {
+            style:`
+            margin: 10px;
+            `
+        });
+        this.textDisplay = this.createElement("div", {
+            style:`
+            color: green;
+            background: black;
+            font-size: 16px;
+            width: 100%;
+            height: 30vh;
+            border-radius: 3px;
+            overflow-y: scroll;
+            padding: 3px;
+            `
+        });
+        this.htmlRenderer = this.createElement("iframe", {
+            style:`
+            width: 100%;
+            height: 30vh;
+            border-radius: 3px;
+            `
+        });
+        this.responseContainer.appendChild(this.textDisplay);
+        this.modal.appendChild(this.responseContainer);
         let btnContainer = this.createElement("div", {
             style:`
                 display: flex;
@@ -196,11 +236,32 @@ class HttpTestConsole {
         btnContainer.appendChild(this.cancelButton);
         this.confirmButton = this.createElement("button", {
             classes: ["nav-link", "good"],
-            text: "📡 Send"
+            text: "📡 Send",
+            listeners: {
+                click: async () => {
+                    this.confirmButton.enabled = false;
+                    let resp = await fetch(`${this.url}?${this.serializeToQueryString()}`, {
+                        method: this.method.value,
+                        body: this.bodyInput.value || undefined,
+                        headers: this.headers
+                    });
+                    let text = await resp.text();
+                    this.textDisplay.textContent = text;
+                }
+            }
         });
         btnContainer.appendChild(this.confirmButton);
         this.modal.appendChild(btnContainer);
     }
+
+    serializeToQueryString() {
+        let str = [];
+        for (const p in this.queryParams)
+          if (this.queryParams.hasOwnProperty(p)) {
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(this.queryParams[p]));
+          }
+        return str.join("&");
+      }
 
     createToast(text) {
         let container = this.createElement("div", {
@@ -279,8 +340,103 @@ class HttpTestConsole {
 
     addHeader(name, value) {
         this.headers[name] = value;
+        this.renderHeaders();
+    }
+
+    renderHeaders() {
+        this.headerList.innerHTML = "";
+        if (Object.keys(this.headers).length == 0) {
+            return;
+        }
+        let baseContainer = this.createElement("div", {
+            style:`
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            padding: 3px;
+            border-top: 1px solid grey;
+            border-bottom: 1px solid grey;
+            `
+        });
+        let header = baseContainer.cloneNode();
+        header.appendChild(this.createTextNode("Name"));
+        header.appendChild(this.createTextNode("Value"));
+        header.appendChild(this.createTextNode(" "));
+        this.headerList.appendChild(header);
         for (const h in this.headers) {
-            
+            //this.addHeaderContainer
+            let container = baseContainer.cloneNode();
+            let txt = this.createElement("div", {
+                style: `
+                margin: 3px;
+                ` 
+            });
+            let Hname = txt.cloneNode();
+            Hname.textContent = h;
+            container.appendChild(Hname);
+            let Hvalue = txt.cloneNode();
+            Hvalue.textContent = this.headers[h];
+            container.appendChild(Hvalue);
+            container.appendChild(this.createElement("button", {
+                classes: ["nav-link", "bad"],
+                text: "❌",
+                listeners: {
+                    click: () => { delete this.headers[h]; this.renderHeaders(); }
+                }
+            }));
+            this.headerList.appendChild(container);
+        }
+    }
+
+    addQueryParam(name, value) {
+        this.queryParams[name] = value;
+        this.renderQueryParams();
+    }
+
+    renderQueryParams() {
+        this.queryParamsList.innerHTML = "";
+        if (Object.keys(this.queryParams).length == 0) {
+            return;
+        }
+        let baseContainer = this.createElement("div", {
+            style:`
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            padding: 3px;
+            border-top: 1px solid grey;
+            border-bottom: 1px solid grey;
+            `
+        });
+        let header = baseContainer.cloneNode();
+        header.appendChild(this.createTextNode("Name"));
+        header.appendChild(this.createTextNode("Value"));
+        header.appendChild(this.createTextNode(" "));
+        this.queryParamsList.appendChild(header);
+        for (const h in this.queryParams) {
+            //this.addHeaderContainer
+            let container = baseContainer.cloneNode();
+            let txt = this.createElement("div", {
+                style: `
+                margin: 3px;
+                ` 
+            });
+            let Hname = txt.cloneNode();
+            Hname.textContent = h;
+            container.appendChild(Hname);
+            let Hvalue = txt.cloneNode();
+            Hvalue.textContent = this.queryParams[h];
+            container.appendChild(Hvalue);
+            container.appendChild(this.createElement("button", {
+                classes: ["nav-link", "bad"],
+                text: "❌",
+                listeners: {
+                    click: () => { delete this.queryParams[h]; this.renderQueryParams(); }
+                }
+            }));
+            this.queryParamsList.appendChild(container);
         }
     }
 }

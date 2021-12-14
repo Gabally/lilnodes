@@ -80,8 +80,8 @@ const addDependency = () => {
 };
 
 const resetEditor = async () => {
-    package = await fetchAsText("/package.json");
-    code = await fetchAsText("/example-function.js");
+    package = await fetchAsText("/examples/package.json");
+    code = await fetchAsText("/examples/example-function.js");
     setCodeActive();
 }
 
@@ -112,7 +112,7 @@ const removeDependency = () => {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
-    package = localStorage.getItem("package") || await fetchAsText("/package.json");
+    package = localStorage.getItem("package") || await fetchAsText("/examples/package.json");
     code = localStorage.getItem("code") || await fetchAsText("/example-function.js");
     editor.updateCode(code);
     editor.onUpdate((newCode) => {
@@ -124,7 +124,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             localStorage.setItem("package", newCode);
         }
     });
-    new HttpTestConsole("http://localhost   ").show();
+    window.x = new HttpTestConsole("/documentation");
+    x.show();
 });
 
 $("#create-node").addEventListener("click", () => {
