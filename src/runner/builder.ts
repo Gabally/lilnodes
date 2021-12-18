@@ -10,7 +10,7 @@ export const prebuildRunnerImage = async (): Promise<any[]> => {
     console.log(await docker.getImage(RUNNER_IMAGE_NAME));
     let images = await docker.listImages();
     let imageLables = images.filter(i => i.Labels !== null).map(i => Object.keys(i.Labels));
-    let runnerPath = path.join(__dirname, "runner");
+    let runnerPath = path.join(__dirname, "docker-runner");
     let stream = await docker.buildImage({
         context: runnerPath,
         src: readdirSync(runnerPath)

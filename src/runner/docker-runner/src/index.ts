@@ -10,9 +10,10 @@ const reader = readline.createInterface({
 
 (async () => {
     try {
-        const { code, dependencies, context } = await readObject(reader);
-        await installPackages(dependencies);
-        let result = await runInSandBox(code, dependencies, context);
+        const { code, pkg, context } = await readObject(reader);
+        let packageJson = JSON.parse(pkg);
+        await installPackages(pkg);
+        let result = await runInSandBox(code,  Object.keys(packageJson["dependencies"]), context);
         writeObject({ type: "success", content: result });
         reader.close();
     } catch(e: any) {

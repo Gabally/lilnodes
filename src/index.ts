@@ -4,6 +4,8 @@ import { NpmCachingProxy } from "./npm-cache/proxy";
 import { DATA_TYPES, validateObject } from "./objectValidator";
 import { addDependency } from "./packageUpdater";
 import { CreateNodeRequest } from "./types";
+import { isDocker } from "./isInDocker";
+import { runSandBoxed } from "./runner";
 
 const app = express();
 const port = 8000;
@@ -48,6 +50,27 @@ app.get("/", (req, res) => {
     res.render("index");
 });
 
+app.all("/test", async (req, res) => {
+    let [code, pkg] =  JSON.parse(<string>req.query.node);
+    let result = await runSandBoxed({
+        query: <Record<string,string>>req.query,
+        method: req.method,
+        headers: <Record<string,string>>req.headers,
+        body: req.body,
+        path: req.path
+    }, code, pkg);
+    if (result.hasError) {
+        res.status(500).json({
+            error: result.error
+        });
+    } else {
+        for (const h in result.headers) {
+            res.setHeader(h, result.headers[h]);
+        }
+        res.status(result.statusCode || 200).send(result.content);
+    }
+});
+
 app.get("/about", (req, res) => {
     res.render("about");
 });
@@ -60,6 +83,15 @@ app.use(express.static("public"));
 
 //docker run --privileged -d --name dind-test docker:dind
 //docker run --add-host=host.docker.internal:host-gateway -it alpine
+if (!isDocker()) {
+console.log(`
+\x1b[31m
+******************
+***** WARNING ****
+******************
+The app is not running under docker, unsafe code will be executed using only the VM2 module
+\x1b[0m`);
+}
 checkForKey();
 let proxo = new NpmCachingProxy({ host: "127.0.0.1", port: 16978 });
 proxo.start();

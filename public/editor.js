@@ -124,8 +124,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             localStorage.setItem("package", newCode);
         }
     });
-    window.x = new HttpTestConsole("/documentation");
-    x.show();
 });
 
 $("#create-node").addEventListener("click", () => {
@@ -138,4 +136,7 @@ $("#remove-dep").addEventListener("click", removeDependency);
 $("#file-code").addEventListener("click", setCodeActive);
 $("#file-package").addEventListener("click", setPackageActive);
 $("#reset-editor").addEventListener("click", resetEditor);
-//$("#test-node").addEventListener("click", testNode);
+$("#test-node").addEventListener("click", () => {
+    let console = new HttpTestConsole("/test", code, package);
+    console.show();
+});

@@ -1,5 +1,7 @@
 class HttpTestConsole {
-    constructor(url) {
+    constructor(url, code, pkg) {
+        this.code = code;
+        this.package = pkg;
         this.url = url;
         this.headers = {};
         this.queryParams = {};
@@ -69,6 +71,7 @@ class HttpTestConsole {
                 ${this.textFieldStyle}
                 width: 100%;
                 height: 100%;
+                resize: none;
             `,
             attributes: {
                 spellcheck: false
@@ -198,7 +201,7 @@ class HttpTestConsole {
             margin: 10px;
             `
         });
-        this.textDisplay = this.createElement("div", {
+        this.textDisplay = this.createElement("textarea", {
             style:`
             color: green;
             background: black;
@@ -208,13 +211,19 @@ class HttpTestConsole {
             border-radius: 3px;
             overflow-y: scroll;
             padding: 3px;
-            `
+            resize: none;
+            `,
+            attributes: {
+                readonly: true
+            }
         });
         this.htmlRenderer = this.createElement("iframe", {
             style:`
             width: 100%;
             height: 30vh;
             border-radius: 3px;
+            background: white;
+            resize: none;
             `
         });
         this.responseContainer.appendChild(this.textDisplay);
@@ -246,7 +255,14 @@ class HttpTestConsole {
                         headers: this.headers
                     });
                     let text = await resp.text();
-                    this.textDisplay.textContent = text;
+                    try {
+                        let parsed = JSON.parse(text);
+                        this.textDisplay.value = JSON.stringify(parsed, null, 4);
+                    } catch(err) {
+                        console.error(err);
+                        this.textDisplay.value = text;
+                    }
+                    this.htmlRenderer.src = `data:text/html;base64,${Base64.encode(text)}`;
                 }
             }
         });
@@ -256,6 +272,7 @@ class HttpTestConsole {
 
     serializeToQueryString() {
         let str = [];
+        this.queryParams["node"] = JSON.stringify([this.code, JSON.stringify(JSON.parse(this.package))]);
         for (const p in this.queryParams)
           if (this.queryParams.hasOwnProperty(p)) {
             str.push(encodeURIComponent(p) + "=" + encodeURIComponent(this.queryParams[p]));
