@@ -433,27 +433,28 @@ class HttpTestConsole {
         header.appendChild(this.createTextNode(" "));
         this.queryParamsList.appendChild(header);
         for (const h in this.queryParams) {
-            //this.addHeaderContainer
-            let container = baseContainer.cloneNode();
-            let txt = this.createElement("div", {
-                style: `
-                margin: 3px;
-                ` 
-            });
-            let Hname = txt.cloneNode();
-            Hname.textContent = h;
-            container.appendChild(Hname);
-            let Hvalue = txt.cloneNode();
-            Hvalue.textContent = this.queryParams[h];
-            container.appendChild(Hvalue);
-            container.appendChild(this.createElement("button", {
-                classes: ["nav-link", "bad"],
-                text: "❌",
-                listeners: {
-                    click: () => { delete this.queryParams[h]; this.renderQueryParams(); }
-                }
-            }));
-            this.queryParamsList.appendChild(container);
+            if (h !== "node") {
+                let container = baseContainer.cloneNode();
+                let txt = this.createElement("div", {
+                    style: `
+                    margin: 3px;
+                    ` 
+                });
+                let Hname = txt.cloneNode();
+                Hname.textContent = h;
+                container.appendChild(Hname);
+                let Hvalue = txt.cloneNode();
+                Hvalue.textContent = this.queryParams[h];
+                container.appendChild(Hvalue);
+                container.appendChild(this.createElement("button", {
+                    classes: ["nav-link", "bad"],
+                    text: "❌",
+                    listeners: {
+                        click: () => { delete this.queryParams[h]; this.renderQueryParams(); }
+                    }
+                }));
+                this.queryParamsList.appendChild(container);   
+            }
         }
     }
 }

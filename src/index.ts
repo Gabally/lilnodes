@@ -11,6 +11,18 @@ const app = express();
 const port = 8000;
 
 app.use(express.json({ limit: "2mb" }));
+app.use((req, res, next) => {
+    // @ts-ignore
+    req.rawBody = "";
+    req.setEncoding("utf8");
+
+    req.on("data", (chunk) => {
+        // @ts-ignore
+        req.rawBody += chunk;
+    });
+
+    req.on("end", next);
+});
 
 app.set("view engine", "pug");
 
@@ -52,11 +64,13 @@ app.get("/", (req, res) => {
 
 app.all("/test", async (req, res) => {
     let [code, pkg] =  JSON.parse(<string>req.query.node);
+    // @ts-ignore
     let result = await runSandBoxed({
         query: <Record<string,string>>req.query,
         method: req.method,
         headers: <Record<string,string>>req.headers,
-        body: req.body,
+        // @ts-ignore
+        body: req.rawBody,
         path: req.path
     }, code, pkg);
     if (result.hasError) {
