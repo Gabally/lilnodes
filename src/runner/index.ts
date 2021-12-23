@@ -1,11 +1,7 @@
+import { spawn } from "child_process";
 import path from "path";
 import { isDocker } from "../isInDocker";
 import { NodeResponse, WebRequestContext } from "../types";
-import { tmpdir } from "os";
-import { makeid } from "../utils";
-import { mkdirSync, rmSync, writeFileSync } from "fs";
-import { installPackages } from "./npm-install";
-import { NodeVM } from "vm2";
 
 export const runSandBoxed = async (context: WebRequestContext, code: string, pkg: string): Promise<NodeResponse>  => {
     if (isDocker()) {
@@ -16,33 +12,24 @@ export const runSandBoxed = async (context: WebRequestContext, code: string, pkg
         };
     } else {
         try {
-            let tempDir = path.join(tmpdir(), makeid(10));
-            console.log(tempDir);
-            mkdirSync(tempDir);
-            writeFileSync(path.join(tempDir, "package.json"), pkg);
-            await installPackages(tempDir);
-            const vm = new NodeVM({
-                require: {
-                    external: Object.keys(JSON.parse(pkg)["dependencies"]),
-                    resolve: (moduleName: string) => {
-                        let modPath = path.resolve(tempDir, "node_modules", moduleName);
-                        if (modPath.startsWith(tempDir)) {
-                            return modPath;
-                        } else {
-                            return "";
-                        }
-                    }
-                },
-                console: "off",
-                wasm: false,
-                eval: false
+            const child = spawn("node", ["index.js", ], {
+                cwd: path.join(__dirname, "system-runner")
             });
-            let sandBoxedFunction = vm.run(code, tempDir);
-            let result = await new Promise((resolve) => {
-                sandBoxedFunction(context, resolve); 
+            child.on("close", (code: number) => {
+                if (code !== 0) {
+                    
+                } else {
+                    
+                }
             });
-            try {rmSync(tempDir, { recursive: true });}catch(e){console.error(e)};
-            return <NodeResponse>result;
+            child.on("error", (err: any) => {
+                
+            });
+            return {
+                statusCode: 500,
+                hasError: true,
+                error: "Docker still not implemented"
+            };
         } catch (err) {
             return {
                 hasError: true,
