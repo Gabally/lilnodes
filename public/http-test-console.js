@@ -248,26 +248,36 @@ class HttpTestConsole {
             text: "📡 Send",
             listeners: {
                 click: async () => {
-                    this.confirmButton.enabled = false;
-                    let resp = await fetch(`${this.url}?${this.serializeToQueryString()}`, {
-                        method: this.method.value,
-                        body: this.bodyInput.value || undefined,
-                        headers: this.headers
-                    });
-                    let text = await resp.text();
+                    this.disableButtons();
                     try {
-                        let parsed = JSON.parse(text);
-                        this.textDisplay.value = JSON.stringify(parsed, null, 4);
-                    } catch(err) {
-                        console.error(err);
-                        this.textDisplay.value = text;
-                    }
-                    this.htmlRenderer.src = `data:text/html;base64,${Base64.encode(text)}`;
+                        let resp = await fetch(`${this.url}?${this.serializeToQueryString()}`, {
+                            method: this.method.value,
+                            body: this.bodyInput.value || undefined,
+                            headers: this.headers
+                        });
+                        let text = await resp.text();
+                        try {
+                            let parsed = JSON.parse(text);
+                            this.textDisplay.value = JSON.stringify(parsed, null, 4);
+                        } catch(err) {
+                            console.error(err);
+                            this.textDisplay.value = text;
+                        }
+                        this.htmlRenderer.src = `data:text/html;base64,${Base64.encode(text)}`;
+                        this.enableButtons();
+                    } catch (err) {
+                        this.enableButtons();
+                    } 
                 }
             }
         });
         btnContainer.appendChild(this.confirmButton);
         this.modal.appendChild(btnContainer);
+    }
+
+    setData(code, pkg) {
+        this.code = code;
+        this.package = pkg;
     }
 
     serializeToQueryString() {

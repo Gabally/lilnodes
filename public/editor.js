@@ -1,5 +1,6 @@
 var editor = new CodeFlask("#editor", { language: "js" });
 var package, code = "";
+var Httpconsole = new HttpTestConsole("/test", code, package);
 var editorFiles = {
     Code: "C",
     Package: "P"
@@ -137,6 +138,6 @@ $("#file-code").addEventListener("click", setCodeActive);
 $("#file-package").addEventListener("click", setPackageActive);
 $("#reset-editor").addEventListener("click", resetEditor);
 $("#test-node").addEventListener("click", () => {
-    let console = new HttpTestConsole("/test", code, package);
-    console.show();
+    Httpconsole.setData(code, package);
+    Httpconsole.show();
 });
