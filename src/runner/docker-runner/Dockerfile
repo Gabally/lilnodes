@@ -7,5 +7,3 @@ RUN npm install
 RUN npm run build
 RUN rm -rf src
 RUN rm tsconfig.json
-
-CMD [ "node", "build/index.js" ]

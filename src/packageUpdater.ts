@@ -1,5 +1,4 @@
 import axios from "axios";
-import { version } from "os";
 import { Package } from "./types";
 
 export const addDependency = async (packageName: string, packageFile: string): Promise<string> => {  

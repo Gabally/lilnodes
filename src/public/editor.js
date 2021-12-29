@@ -60,7 +60,7 @@ const addDependency = () => {
         actionText: "📦 Install",
         action: async () => {
             modal.disableButtons();
-            let { success, packageFile, error } = await sendPOST("/addPackage", {
+            let { success, packageFile, error } = await sendPOST("/npminstall", {
                 packageName: modal.getValue(),
                 packageFile: package
             });
@@ -114,7 +114,7 @@ const removeDependency = () => {
 
 document.addEventListener("DOMContentLoaded", async () => {
     package = localStorage.getItem("package") || await fetchAsText("/examples/package.json");
-    code = localStorage.getItem("code") || await fetchAsText("/example-function.js");
+    code = localStorage.getItem("code") || await fetchAsText("/examples/example-function.js");
     editor.updateCode(code);
     editor.onUpdate((newCode) => {
         if (selectedFile === editorFiles.Code) {

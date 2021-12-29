@@ -13,7 +13,7 @@ export const RunInSystemSandBox = async (context: WebRequestContext, code: strin
     await installPackages(tempDir);
     const vm = new NodeVM({
         require: {
-            external: Object.keys(JSON.parse(pkg)["dependencies"]),
+            external: Object.keys(JSON.parse(pkg)["dependencies"] || {}),
             resolve: (moduleName) => {
                 let modPath = path.resolve(tempDir, "node_modules", moduleName);
                 if (modPath.startsWith(tempDir)) {
@@ -42,7 +42,7 @@ export const installPackages = async (installPath: string): Promise<void> => {
         });
         child.on("close", (code) => {
             if (code !== 0) {
-                reject(new Error("An error occurred while installing the packages"));
+                reject("An error occurred while installing the packages");
             } else {
                 resolve();
             }
@@ -56,6 +56,7 @@ export const installPackages = async (installPath: string): Promise<void> => {
 process.on("message", async (message: string): Promise<void> => {
     let command = JSON.parse(message);
     if (command.type == "EXEC" && process.send) {
+      command.context.body = Buffer.from(command.context.body, "base64");
       process.send(JSON.stringify(await RunInSystemSandBox(command.context, command.code, command.pkg)));
     }
 });

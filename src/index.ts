@@ -6,27 +6,23 @@ import { addDependency } from "./packageUpdater";
 import { CreateNodeRequest } from "./types";
 import { isDocker } from "./isInDocker";
 import { runSandBoxed } from "./runner";
+import { prebuildRunnerImage } from "./runner/builder";
+import path from "path";
+import { writeFileSync } from "fs";
+import { getRequestRawBody } from "./utils";
 
 const app = express();
 const port = 8000;
 
+app.set("views", path.join(__dirname, "views"));
+
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use(express.json({ limit: "2mb" }));
-app.use((req, res, next) => {
-    // @ts-ignore
-    req.rawBody = "";
-    req.setEncoding("utf8");
-
-    req.on("data", (chunk) => {
-        // @ts-ignore
-        req.rawBody += chunk;
-    });
-
-    req.on("end", next);
-});
 
 app.set("view engine", "pug");
 
-app.post("/addPackage", async (req, res) => {
+app.post("/npminstall", async (req, res) => {
     try {
         let { packageName, packageFile } = req.body;
         let newPackage = await addDependency(packageName, packageFile);
@@ -38,6 +34,8 @@ app.post("/addPackage", async (req, res) => {
 
 //await asyncEvery(data.dependencies, async(d) => await checkPackage(d))
 app.post("/createnode", async (req, res) => {
+    //@ts-ignore
+    console.log(req.rawBody);
     let data = <CreateNodeRequest>req.body;
     if (validateObject({
         code: DATA_TYPES.STRING,
@@ -55,13 +53,11 @@ app.get("/", (req, res) => {
 
 app.all("/test", async (req, res) => {
     let [code, pkg] =  JSON.parse(<string>req.query.node);
-    // @ts-ignore
     let result = await runSandBoxed({
         query: <Record<string,string>>req.query,
         method: req.method,
         headers: <Record<string,string>>req.headers,
-        // @ts-ignore
-        body: req.rawBody,
+        body: await getRequestRawBody(req),
         path: req.path
     }, code, pkg);
     if (result.hasError) {
@@ -84,22 +80,24 @@ app.get("/documentation", (req, res) => {
     res.render("docs");
 });
 
-app.use(express.static("public"));
-
 //docker run --privileged -d --name dind-test docker:dind
 //docker run --add-host=host.docker.internal:host-gateway -it alpine
-if (!isDocker()) {
-console.log(`
-\x1b[31m
-******************
-***** WARNING ****
-******************
-The app is not running under docker, unsafe code will be executed using only the VM2 module
-\x1b[0m`);
-}
-checkForKey();
-let proxo = new NpmCachingProxy({ host: "127.0.0.1", port: 16978 });
-proxo.start();
-app.listen(port, () => {
-    console.log(`App listening at http://localhost:${port}`);
-});
+(async () => {
+    if (!isDocker()) {
+    console.log(`
+    \x1b[31m
+    ******************
+    ***** WARNING ****
+    ******************
+    The app is not running under docker, unsafe code will be executed using only the VM2 module
+    \x1b[0m`);
+    } else {
+        await prebuildRunnerImage();
+    }
+    checkForKey();
+    let proxo = new NpmCachingProxy({ host: "127.0.0.1", port: 16978 });
+    proxo.start();
+    app.listen(port, () => {
+        console.log(`App listening at http://localhost:${port}`);
+    });
+})();

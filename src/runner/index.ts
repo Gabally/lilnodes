@@ -2,14 +2,27 @@ import { fork } from "child_process";
 import path from "path";
 import { isDocker } from "../isInDocker";
 import { NodeResponse, WebRequestContext } from "../types";
+import Docker from "dockerode";
+import { RUNNER_IMAGE_NAME } from "./constants";
+import streams from "memory-streams";
 
 export const runSandBoxed = async (context: WebRequestContext, code: string, pkg: string): Promise<NodeResponse>  => {
+    context.body = context.body.toString("base64");
     if (isDocker()) {
-        return {
-            statusCode: 500,
-            hasError: true,
-            error: "Docker still not implemented"
-        };
+        let docker = new Docker();
+        const stdout = new streams.WritableStream();
+        const stderr = new streams.WritableStream();
+        let [res, container] = await docker.run(RUNNER_IMAGE_NAME, ["node", "build/index.js", code, pkg, JSON.stringify(context)], [stdout, stderr], { Tty: false, HostConfig: { AutoRemove: true, Runtime: "runsc" }});
+        let response = JSON.parse(stdout.toString());
+        if (response.type == "success") {
+            return response.content;
+        } else {
+            return {
+                statusCode: 500,
+                hasError: true,
+                error: response.content
+            };
+        }
     } else {
         try {
             return await new Promise((resolve, reject) => {
@@ -29,7 +42,9 @@ export const runSandBoxed = async (context: WebRequestContext, code: string, pkg
                     pkg: pkg
                 }));
             });
-        } catch (err) {
+        } catch (err: any) {
+            console.log("Err (non docker)");
+            console.log(err);
             return {
                 hasError: true,
                 error: <string>err || "Unknown error"
