@@ -27,10 +27,70 @@ const fetchAsText = async (url) => {
 
 const  createNode = async () => {
     let { success, url } = await sendPOST("/createnode", {
-        code: editor.getCode(),
-        dependencies: dependencies
+        code: code,
+        package: package
     });
-    console.log(success, url); 
+    if (success) {
+        let mainContainer = crafteElement("div", {
+            style:`
+            border: 2px solid black;
+            background: rgba(105, 230, 105, 0.877);
+            color: black;
+            margin: 10px;
+            font-weight: bold;
+            `
+        });
+        let nodeURLTitle = crafteElement("div", {
+            style:`
+            padding: 8px;
+            `,
+            text: "URL:"
+        });
+        mainContainer.appendChild(nodeURLTitle);
+        let nodeURLContainer = crafteElement("div", {
+            style:`
+            margin: 5px;
+            padding: 3px;
+            text-overflow: ellipsis; 
+            max-width: 100%;
+            background: grey;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            `
+        });
+        let nodeURL = crafteElement("div", {
+            style:`
+            width: 97%;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            background: white;
+            padding: 1px;
+            `,
+            text: `${window.location.origin}/run/${url}`
+        });
+        nodeURLContainer.appendChild(nodeURL);
+        let copyBtn = crafteElement("button", {
+            classes: ["nav-link"],
+            style:`
+            border: 2px solid black;
+            border-radius: 3px;
+            padding: 2px;
+            `,
+            text: "📋",
+            listeners: {
+                click: () => {
+                    navigator.clipboard.writeText(`${window.location.origin}/run/${url}`);
+                }
+            }
+        });
+        nodeURLContainer.appendChild(copyBtn);
+        mainContainer.appendChild(nodeURLContainer);
+        $("#nodes").appendChild(mainContainer);
+    }
 };
 
 const $ = (selector) => {
@@ -40,6 +100,20 @@ const $ = (selector) => {
 const newElement = (name) => {
     return document.createElement(name);
 };
+
+const crafteElement = (element, options={}) => {
+    let el = document.createElement(element);
+    el.innerText = options.text || "";
+    (options.classes || []).forEach(c => el.classList.add(c));
+    el.setAttribute("style", options.style || "");
+    for (const event in options.listeners || {}) {
+        el.addEventListener(event, options.listeners[event]);
+    }
+    for (const attr in options.attributes || {}) {
+        el.setAttribute(attr, options.attributes[attr]);
+    }
+    return el;
+}
 
 const setCodeActive = () => {
     $("#file-code").classList.add("selected-file");

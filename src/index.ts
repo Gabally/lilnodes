@@ -10,6 +10,7 @@ import { prebuildRunnerImage } from "./runner/builder";
 import path from "path";
 import { writeFileSync } from "fs";
 import { getRequestRawBody } from "./utils";
+import { minify, MinifyOutput } from "terser";
 
 const app = express();
 const port = 8000;
@@ -32,18 +33,33 @@ app.post("/npminstall", async (req, res) => {
     }
 });
 
-//await asyncEvery(data.dependencies, async(d) => await checkPackage(d))
 app.post("/createnode", async (req, res) => {
-    //@ts-ignore
-    console.log(req.rawBody);
     let data = <CreateNodeRequest>req.body;
-    if (validateObject({
-        code: DATA_TYPES.STRING,
-        package: DATA_TYPES.STRING
-    }, data)) {
-        res.status(200).json({ success: true, url: encryptCode(JSON.stringify(data))});
-    } else {
-        res.status(400).json({ success: false, error: "Invalid data" });
+    try {
+        let validationError = validateObject({
+            code: DATA_TYPES.STRING,
+            package: DATA_TYPES.VALID_JSON
+        }, data); 
+        if (validationError) {
+            res.status(400).json({ success: false, error: validationError });
+        } else {
+            let compressed: MinifyOutput;
+            try {
+                compressed = await minify(data.code);
+            } catch(e) {
+                res.status(400).json({ success: false, error: "An error occurred while creating the node (check your code for syntax errors)" });
+                return;
+            }
+            let payload = {
+                c: compressed.code,
+                p: JSON.parse(data.package)["dependencies"] || []
+            };
+            let encrypted = await encryptCode(JSON.stringify(payload));
+            res.status(200).json({ success: true, url: encrypted });
+        }
+    } catch(e) {
+        console.error(e);
+        res.status(500).json({ success: false, error: "An internal error occurred while creating the node" });
     }
 });
 

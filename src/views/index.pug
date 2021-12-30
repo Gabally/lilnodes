@@ -20,8 +20,9 @@ div
             button(id="test-node" class="nav-link test") ⚗️ Test
     div.center.button-group
         button(id="create-node" class="nav-link") Create
-    div.center
+    div(class="center" style="flex-direction: column;")
         h3="Created Nodes:"
+        div#nodes
     script(src="/codeflask.min.js")
     script(src="/b64.js")
     script(src="/command-modal.js")

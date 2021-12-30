@@ -2,6 +2,7 @@ export const DATA_TYPES = {
     STRING: "string",
     NUMBER: "number",
     BOOLEAN: "boolean",
+    VALID_JSON: "json"
 };
 
 export class ArrayType {
@@ -12,7 +13,7 @@ export class ArrayType {
     }
 }
 
-export const validateObject = (model: any, data: any): boolean => {
+export const validateObject = (model: any, data: any): string | undefined => {
     let keys = Object.keys(model);
     for (let i = 0; i < keys.length; i++) {
         const k = keys[i];
@@ -20,15 +21,21 @@ export const validateObject = (model: any, data: any): boolean => {
             try {
                 for (let i = 0; i < data[k].length; i++) {
                     if (typeof(data[k][i]) !== model[k].type) {
-                        return false;
+                        return `${k} is not a valid array of ${model[k].type}`;
                     }
                 }
             } catch(err) {
-                return false;
+                return `${k} is not a valid array of ${model[k].type}`;
+            }
+        } else if (model[k] === DATA_TYPES.VALID_JSON) {
+            try {
+                JSON.parse(data[k]);
+            } catch(e) {
+                return `${k} is not a valid JSON string`;
             }
         } else if (!(data[k] && typeof(data[k]) === model[k])) {
-            return false;
+            return `${k} is not a valid ${model[k]}`;
         }
     }
-    return true;
+    return undefined;
 };

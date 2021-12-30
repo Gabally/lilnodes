@@ -234,3 +234,7 @@ h3 {
 .test {
     background: rgb(53, 130, 218);
 }
+
+#nodes {
+    width: 90%;
+}
