@@ -16,3 +16,6 @@ RUN cp -r src/public build/public
 RUN cp -r src/views build/views
 RUN rm -rf src
 RUN rm tsconfig.json
+COPY startup.sh .
+RUN chmod +x startup.sh
+ENTRYPOINT ["/usr/src/app/startup.sh"]

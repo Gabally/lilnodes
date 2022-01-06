@@ -5,3 +5,5 @@
 **/cache-files
 **/key
 **/.vscode
+!startup.sh
+!install-gVisor.sh

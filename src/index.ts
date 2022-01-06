@@ -1,16 +1,17 @@
 import express from "express";
-import { checkForKey, encryptCode } from "./encryption";
+import { checkForKey, decryptCode, encryptCode } from "./encryption";
 import { NpmCachingProxy } from "./npm-cache/proxy";
-import { DATA_TYPES, validateObject } from "./objectValidator";
+import { ArrayType, DATA_TYPES, validateObject } from "./objectValidator";
 import { addDependency } from "./packageUpdater";
 import { CreateNodeRequest } from "./types";
 import { isDocker } from "./isInDocker";
 import { runSandBoxed } from "./runner";
 import { prebuildRunnerImage } from "./runner/builder";
 import path from "path";
-import { writeFileSync } from "fs";
+import { readFileSync } from "fs";
 import { getRequestRawBody } from "./utils";
 import { minify, MinifyOutput } from "terser";
+import { readFile } from "fs/promises";
 
 const app = express();
 const port = 8000;
@@ -61,6 +62,43 @@ app.post("/createnode", async (req, res) => {
         console.error(e);
         res.status(500).json({ success: false, error: "An internal error occurred while creating the node" });
     }
+});
+
+app.all("/run/:code", async (req, res) => {
+    try {
+        let decrypted = await decryptCode(req.params.code);
+        let contents = JSON.parse(decrypted);
+        let validationError = validateObject({
+            c: DATA_TYPES.STRING,
+            p: new ArrayType(DATA_TYPES.STRING)
+        }, contents); 
+        if (validationError) {
+            res.status(400).json({ error: `The submitted code has an invalid format: ${validationError}` });
+        } else {
+            let packageFile = await readFile(path.join(__dirname, "public", "examples", "package.json"), "utf-8");
+            let packageJSON = JSON.parse(packageFile);
+            packageJSON["dependencies"] = contents.p;
+            let result = await runSandBoxed({
+                query: <Record<string,string>>req.query,
+                method: req.method,
+                headers: <Record<string,string>>req.headers,
+                body: await getRequestRawBody(req),
+                path: req.path
+            }, contents.c, JSON.stringify(packageJSON));
+            if (result.hasError) {
+                res.status(500).json({
+                    error: result.error
+                });
+            } else {
+                for (const h in result.headers) {
+                    res.setHeader(h, result.headers[h]);
+                }
+                res.status(result.statusCode || 200).send(result.content);
+            }
+        }
+    } catch(e) {
+        res.status(500).json({ success: false, error: e });
+    } 
 });
 
 app.get("/", (req, res) => {
