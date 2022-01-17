@@ -33,6 +33,7 @@ export const runSandBoxed = async (context: WebRequestContext, code: string, pkg
                 }, 10000);
                 child.on("message", (message: string): void => {
                     clearTimeout(timeout);
+                    child.kill("SIGKILL");
                     resolve(JSON.parse(message));
                 });
                 child.send(JSON.stringify({
@@ -43,6 +44,8 @@ export const runSandBoxed = async (context: WebRequestContext, code: string, pkg
                 }));
             });
         } catch (err: any) {
+            //@ts-ignore
+            try { child.kill("SIGKILL"); } catch (e) { }
             console.log("Err (non docker)");
             console.log(err);
             return {
