@@ -1,4 +1,7 @@
-var editor = new CodeFlask("#editor", { language: "js" });
+var editor = ace.edit("editor");
+editor.session.setMode("ace/mode/javascript");
+editor.setFontSize(16);
+
 var package, code = "";
 var Httpconsole = new HttpTestConsole("/test", code, package);
 var editorFiles = {
@@ -9,7 +12,7 @@ var selectedFile = editorFiles.Code;
 
 var dependencies = [];
 
-const sendPOST = async (url, data) => {
+const sendPOST = async(url, data) => {
     let resp = await fetch(url, {
         method: "POST",
         headers: {
@@ -20,19 +23,19 @@ const sendPOST = async (url, data) => {
     return await resp.json();
 };
 
-const fetchAsText = async (url) => {
+const fetchAsText = async(url) => {
     let resp = await fetch(url);
     return await resp.text();
 };
 
-const  createNode = async () => {
+const createNode = async() => {
     let { success, url } = await sendPOST("/createnode", {
         code: code,
         package: package
     });
     if (success) {
         let mainContainer = crafteElement("div", {
-            style:`
+            style: `
             border: 2px solid black;
             background: rgba(105, 230, 105, 0.877);
             color: black;
@@ -41,14 +44,14 @@ const  createNode = async () => {
             `
         });
         let nodeURLTitle = crafteElement("div", {
-            style:`
+            style: `
             padding: 8px;
             `,
             text: "URL:"
         });
         mainContainer.appendChild(nodeURLTitle);
         let nodeURLContainer = crafteElement("div", {
-            style:`
+            style: `
             margin: 5px;
             padding: 3px;
             text-overflow: ellipsis; 
@@ -61,7 +64,7 @@ const  createNode = async () => {
             `
         });
         let nodeURL = crafteElement("div", {
-            style:`
+            style: `
             width: 97%;
             display: block;
             overflow: hidden;
@@ -75,7 +78,7 @@ const  createNode = async () => {
         nodeURLContainer.appendChild(nodeURL);
         let copyBtn = crafteElement("button", {
             classes: ["nav-link"],
-            style:`
+            style: `
             border: 2px solid black;
             border-radius: 3px;
             padding: 2px;
@@ -101,7 +104,7 @@ const newElement = (name) => {
     return document.createElement(name);
 };
 
-const crafteElement = (element, options={}) => {
+const crafteElement = (element, options = {}) => {
     let el = document.createElement(element);
     el.innerText = options.text || "";
     (options.classes || []).forEach(c => el.classList.add(c));
@@ -116,23 +119,23 @@ const crafteElement = (element, options={}) => {
 }
 
 const setCodeActive = () => {
+    selectedFile = editorFiles.Code;
     $("#file-code").classList.add("selected-file");
     $("#file-package").classList.remove("selected-file");
-    editor.updateCode(code);
-    selectedFile = editorFiles.Code;
+    editor.setValue(code, -1);
 };
 
 const setPackageActive = () => {
+    selectedFile = editorFiles.Package;
     $("#file-package").classList.add("selected-file");
     $("#file-code").classList.remove("selected-file");
-    editor.updateCode(package);
-    selectedFile = editorFiles.Package;
+    editor.setValue(package, -1);
 };
 
 const addDependency = () => {
     let modal = new CommandModal("add Dependency", "npm install", {
         actionText: "📦 Install",
-        action: async () => {
+        action: async() => {
             modal.disableButtons();
             let { success, packageFile, error } = await sendPOST("/npminstall", {
                 packageName: modal.getValue(),
@@ -143,7 +146,7 @@ const addDependency = () => {
                 modal.clearModal();
                 package = packageFile;
                 if (selectedFile === editorFiles.Package) {
-                    editor.updateCode(package);
+                    editor.setValue(package, -1);
                 }
             } else {
                 modal.showError(error);
@@ -154,7 +157,7 @@ const addDependency = () => {
     modal.show();
 };
 
-const resetEditor = async () => {
+const resetEditor = async() => {
     package = await fetchAsText("/examples/package.json");
     code = await fetchAsText("/examples/example-function.js");
     setCodeActive();
@@ -172,7 +175,7 @@ const removeDependency = () => {
                 }
                 package = JSON.stringify(packageJson, null, 4);
                 if (selectedFile === editorFiles.Package) {
-                    editor.updateCode(package);
+                    editor.setValue(package, -1);
                 }
                 modal.showInfo("package removed");
                 modal.clearModal();
@@ -186,11 +189,12 @@ const removeDependency = () => {
     modal.show();
 };
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async() => {
     package = localStorage.getItem("package") || await fetchAsText("/examples/package.json");
     code = localStorage.getItem("code") || await fetchAsText("/examples/example-function.js");
-    editor.updateCode(code);
-    editor.onUpdate((newCode) => {
+    editor.setValue(code, -1);
+    editor.on("change", () => {
+        let newCode = editor.getValue();
         if (selectedFile === editorFiles.Code) {
             code = newCode;
             localStorage.setItem("code", newCode);

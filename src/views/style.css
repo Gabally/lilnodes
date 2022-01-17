@@ -82,23 +82,11 @@ body::-webkit-scrollbar-thumb {
     color: rgba(214, 214, 214, 0.815);
 }
 
-.codeflask {
-    width: 100% !important;
-    height: 70vh !important;
-    border: 2px solid rgba(97, 97, 97, 0.815);
-    border-radius: 5px;
-    position: relative !important;
-}
-
 h3 {
     margin-top: 10px;
     margin-bottom: 10px;
     text-align: center;
     color: rgb(206, 206, 206);
-}
-
-.codeflask__textarea {
-    background: rgba(167, 167, 167, 0.301) !important;
 }
 
 .button-group {
@@ -181,6 +169,7 @@ h3 {
 
 #editor {
     width: 100%;
+    height: 70vh;
 }
 
 .filename {
