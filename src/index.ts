@@ -12,9 +12,13 @@ import { readFileSync } from "fs";
 import { getRequestRawBody } from "./utils";
 import { minify, MinifyOutput } from "terser";
 import { readFile } from "fs/promises";
+import ExpressBrute from "express-brute";
 
 const app = express();
 const port = 8000;
+
+const store = new ExpressBrute.MemoryStore();
+const bruteforce = new ExpressBrute(store);
 
 app.set("views", path.join(__dirname, "views"));
 
@@ -105,7 +109,7 @@ app.get("/", (req, res) => {
     res.render("index");
 });
 
-app.all("/test", async (req, res) => {
+app.all("/test", bruteforce.prevent, async (req, res) => {
     let [code, pkg] =  JSON.parse(<string>req.query.node);
     let result = await runSandBoxed({
         query: <Record<string,string>>req.query,
