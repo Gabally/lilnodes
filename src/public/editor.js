@@ -1,6 +1,6 @@
 var editor = ace.edit("editor");
 editor.session.setMode("ace/mode/javascript");
-editor.setFontSize(16);
+editor.setFontSize(14);
 
 var package, code = "";
 var Httpconsole = new HttpTestConsole("/test", code, package);

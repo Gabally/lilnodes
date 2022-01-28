@@ -8,7 +8,6 @@ import { isDocker } from "./isInDocker";
 import { runSandBoxed } from "./runner";
 import { prebuildRunnerImage } from "./runner/builder";
 import path from "path";
-import { readFileSync } from "fs";
 import { getRequestRawBody } from "./utils";
 import { minify, MinifyOutput } from "terser";
 import { readFile } from "fs/promises";
@@ -68,7 +67,7 @@ app.post("/createnode", async (req, res) => {
     }
 });
 
-app.all("/run/:code", async (req, res) => {
+app.all("/run/:code", bruteforce.prevent, async (req, res) => {
     try {
         let decrypted = await decryptCode(req.params.code);
         let contents = JSON.parse(decrypted);
