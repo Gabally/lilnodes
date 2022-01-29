@@ -57,6 +57,16 @@ process.on("message", async (message: string): Promise<void> => {
     let command = JSON.parse(message);
     if (command.type == "EXEC" && process.send) {
       command.context.body = Buffer.from(command.context.body, "base64");
-      process.send(JSON.stringify(await RunInSystemSandBox(command.context, command.code, command.pkg)));
+      try {
+        let response = await RunInSystemSandBox(command.context, command.code, command.pkg);
+        process.send(JSON.stringify(response));
+      } catch(e) {
+          process.send(JSON.stringify( {
+            statusCode: 500,
+            hasError: true,
+            //@ts-ignore
+            error: <string>e.toString() || "An unknown internal error occurred"
+        }));
+      }
     }
 });
