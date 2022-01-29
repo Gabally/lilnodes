@@ -3,7 +3,7 @@
     <img src="src/public/knot.png" width="60">
 </p>
 
-### Little pieces of code to help you tie things together
+### Little pieces of code to help you tie things together, made with Node and Ddocker.
 
 ### Main features:
 
@@ -19,3 +19,31 @@
 - The node will timeout after 10 seconds of execution
 - No access to the default node modules
 - The execute endpoint is limited to one execution every 3 seconds
+
+
+## Start the project
+```
+npm run start
+```
+
+## Start the project for development
+
+```
+npm run dev
+```
+
+## Build the lil-nodes container
+```
+npm run build-docker
+```
+
+## Build and run the lil-nodes container
+```
+npm run run-docker
+```
+
+# Warning ⚠️
+
+- The docker container must be started with the ```--privileged``` flag, since it uses gVisor internally, and it is a requirement.
+
+- If you dont use docker you wont have the protection that gVisor offers, making you more vulnerable to attacks.
