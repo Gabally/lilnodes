@@ -1,4 +1,4 @@
-## About
+# About
 
 Lil Nodes is a platform to run serverless functions embedded in a url.
 
